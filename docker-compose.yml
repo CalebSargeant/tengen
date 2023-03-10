@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  platform1-frontend:
+    image: "tengen/platform1-frontend"
+    container_name: p1-fe
+    expose:
+      - "4200"
+    networks:
+      platform1:
+        ipv4_address: "172.1.1.2"
+
+  platform1-backend:
+    image: "tengen/platform1-backend"
+    container_name: p1-be
+    expose:
+      - "8082"
+    networks:
+      platform1:
+        ipv4_address: "172.1.1.3"
+
+  platform1-driver:
+    image: "tengen/platform1-driver"
+    container_name: p1-hd
+    ports:
+      - "3333:3333"
+    networks:
+      platform1:
+        ipv4_address: "172.1.1.4"
+
+  platform1-nginx:
+    image: "tengen/platform1-nginx"
+    container_name: p1-nx
+    ports:
+      - "80:80"
+      #- "8082:8082"
+    networks:
+      platform1:
+        ipv4_address: "172.1.1.5"
+    depends_on:
+      - "platform1-frontend"
+      - "platform1-backend"
+
+networks:
+  platform1:
+    name: platform1
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.1.1.0/24"
+          gateway: "172.1.1.1"
+
+x-labels:
+  com.docker.compose.project: platform1
